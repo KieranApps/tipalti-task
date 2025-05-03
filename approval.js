@@ -1,6 +1,6 @@
 // Below functions are the 'async endpoints' that would be exported and used in this were a server using API calls
 
-import { data } from "./dataStore.js";
+import { data } from './dataStore.js';
 
 const THRESHOLD = 1000; // Can move to 'constants.js' if in full project
 
@@ -18,7 +18,7 @@ export function startApproval(expense) {
         return false;
     }
     // Check id not in use
-    // This would check the expense DB if it exists, but here since its all linear and in the data object, just check pastApprovals
+    // This would check the expense DB if it exists, but here since its all linear (i.e., one is started the completed) and in the data object, just check pastApprovals
     const expenseExists = data.pastApprovals.find((exp) => {
         return exp.id === expense.id;
     });
@@ -77,7 +77,7 @@ export function nextApprovers(expenseId) {
         case 2: // Approved by boss and bosses boss
             expense.nextStep = 'finance';
             return getFinance();
-        break;
+            break;
         default: // Init
             expense.nextStep = 'boss';
             const user = data.users.find(u => u.uid === expense.submitter);
@@ -115,7 +115,7 @@ export function approve(expenseId, approverId) {
 }
 
 /**
- * Mark the provided expense as 
+ * Mark the provided expense as rejected
  * @param {int} expenseId 
  * @param {int} approverId 
  */
@@ -133,7 +133,6 @@ export function reject(expenseId, approverId) {
 
 // ---- For debug ---- //
 export function dumpFlow(expenseId) {
-    // Since data, activeExpenses or pastExpenses depending on which, has all info on flow so far, jump dump/print the object in readable way
     let expense = data.activeExpenses.find(ex => {
         return ex.id === expenseId;
     });
