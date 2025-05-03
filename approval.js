@@ -3,6 +3,7 @@
 import { data } from './dataStore.js';
 
 const THRESHOLD = 1000; // Can move to 'constants.js' if in full project
+const STEPS = {boss: 'Boss', finance: 'Finance'};
 
 /**
  * Starts the expense approval flow, adding needed information about the expense and its state
@@ -65,21 +66,21 @@ export function nextApprovers(expenseId) {
                 const user = data.users.find(u => u.uid === expense.approvedBy[0]);
                 if (user.manager === expense.approvedBy[0]) {
                     // If manager is who just approved, move to finance
-                    expense.nextStep = 'finance';
+                    expense.nextStep = STEPS.finance;
                     return getFinance();
                 }
-                expense.nextStep = 'boss';
+                expense.nextStep = STEPS.boss;
                 return [user.manager]
             }
-            expense.nextStep = 'finance';
+            expense.nextStep = STEPS.finance;
             return getFinance();
             break;
         case 2: // Approved by boss and bosses boss
-            expense.nextStep = 'finance';
+            expense.nextStep = STEPS.finance;
             return getFinance();
             break;
         default: // Init
-            expense.nextStep = 'boss';
+            expense.nextStep = STEPS.boss;
             const user = data.users.find(u => u.uid === expense.submitter);
             return [user.manager];
             break;
@@ -102,7 +103,7 @@ export function approve(expenseId, approverId) {
     const step = expense.approvedBy.length;
     if ((expense.amount >= THRESHOLD && step === 3) ||
         (expense.amount <  THRESHOLD && step === 2) ||
-        (expense.nextStep === 'finance'))
+        (expense.nextStep === STEPS.finance))
     {
         // Complete
         const completedExpense = {...expense};
